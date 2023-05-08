@@ -26,8 +26,6 @@ func ReadPixels(fullFileName string) ([][]*Pixel, error) {
 		_ = picture.Close()
 	}()
 
-	fmt.Println(fullFileName)
-
 	img, _, err := image.Decode(picture)
 	if err != nil {
 		return nil, err
