@@ -4,6 +4,7 @@ import (
 	"github.com/EDEN45/go_neural_network_test/internal/dataset"
 	_ "image/png"
 	"log"
+	"time"
 )
 
 func main() {
@@ -19,6 +20,10 @@ func main() {
 	if err := imgLd.Load(); err != nil {
 		log.Println(err)
 		return
+	}
+
+	for {
+		time.Sleep(10 * time.Second)
 	}
 
 }
