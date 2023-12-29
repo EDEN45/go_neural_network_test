@@ -3,7 +3,6 @@ package neural_network
 import (
 	"math"
 	"math/rand"
-	"time"
 )
 
 // TODO need find, why?
@@ -33,7 +32,6 @@ type SimpleNeuralNetworkConf struct {
 }
 
 func NewSimpleNeuralNetwork(conf SimpleNeuralNetworkConf) *SimpleNeuralNetwork {
-	rand.Seed(time.Now().UnixNano())
 	lenSizeLayers := len(conf.SizeLayers)
 
 	// we create neurons layers from of count layers
@@ -118,6 +116,5 @@ func (s *SimpleNeuralNetwork) BackPropagation(targets []float64) {
 				errsNext[i] += l.weights[i][j] * errsNext[j]
 			}
 		}
-
 	}
 }

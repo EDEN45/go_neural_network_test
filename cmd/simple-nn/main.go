@@ -1,29 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"github.com/EDEN45/go_neural_network_test/internal/dataset"
 	_ "image/png"
 	"log"
-	"time"
 )
 
 func main() {
-	imgLd, err := dataset.NewImgDigitise(dataset.Conf{
-		Path:         "/home/eden/sdb500/eden/projects/simple-nn/digist-dataset/mnist_train/train",
-		CountDataset: 60000,
-	})
+	digits, countFiles, err := dataset.LoadDigits("/Users/eden/SDAPFS512/Projects/train")
 	if err != nil {
-		log.Println("Error init image loader")
-		return
-	}
-
-	if err := imgLd.Load(); err != nil {
 		log.Println(err)
 		return
 	}
 
-	for {
-		time.Sleep(10 * time.Second)
-	}
-
+	fmt.Println(len(digits), countFiles)
 }

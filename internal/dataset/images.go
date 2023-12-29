@@ -12,97 +12,58 @@ var ErrImgDigitsEmptyPath = fmt.Errorf("empty path")
 var ErrImgDigitsCountDatasetZero = fmt.Errorf("count dataset zero")
 var ErrImgDigitsDatasetNotFound = fmt.Errorf("dataset doen`t find")
 
-// ImgDigits based on dataset in https://github.com/pjreddie
+// DigitBuff based on dataset in https://github.com/pjreddie
 // git: https://github.com/pjreddie/mnist-csv-png
-type ImgDigits struct {
-	filesPath    string
-	countDataset int32
-
-	// map[JustNumber]map[NumberDigit]ImageFile
-	images map[int8][]*DigitBuff
-}
 
 type DigitBuff struct {
 	Digit  int8
 	Pixels []float64
 }
 
-type Conf struct {
-	Path         string
-	CountDataset int32
-	CountPixels  int32
-}
-
-func NewImgDigitise(conf Conf) (*ImgDigits, error) {
-	if conf.Path == "" {
-		return nil, ErrImgDigitsEmptyPath
-	}
-
-	if conf.CountDataset == 0 {
-		return nil, ErrImgDigitsCountDatasetZero
-	}
-
-	return &ImgDigits{
-		filesPath:    conf.Path,
-		countDataset: conf.CountDataset,
-		images:       make(map[int8][]*DigitBuff),
-	}, nil
-}
-
-func (l *ImgDigits) Load() error {
-	dirEntries, err := os.ReadDir(l.filesPath)
+func LoadDigits(filesPath string) ([]DigitBuff, int, error) {
+	fileDigits, err := os.ReadDir(filesPath)
 	if err != nil {
-		return fmt.Errorf("ImgDigits.Load.os.ReadDir, err: %w", err)
-	}
-	if len(dirEntries) != int(l.countDataset) {
-		return fmt.Errorf(
-			"ImgDigits.Load, count dirEntries: %d isn`t equils l.countDataset: %d",
-			len(dirEntries),
-			l.countDataset,
-		)
+		return nil, 0, fmt.Errorf("ImgDigits.Load.os.ReadDir, err: %w", err)
 	}
 
-	log.Println("START load digits")
-	for _, de := range dirEntries {
+	loadedDigits := make([]DigitBuff, 0, len(fileDigits))
+
+	log.Println("START load digits, count: ", len(fileDigits))
+
+	for i, de := range fileDigits {
+		fmt.Printf("%.2f %s \n", float64(i)/float64(len(fileDigits))*100, " %")
 		fileName := de.Name()
-		digit, err := l.parseDigit(fileName)
+		digit, err := parseDigit(fileName)
 		if err != nil {
 			log.Println("Parse number digit, err: ", err.Error())
 			continue
 		}
 
-		pixelsRaw, err := rgbPixel.ReadPixels(l.filesPath + string(os.PathSeparator) + fileName)
+		rawPixels, err := rgbPixel.ReadPixels(filesPath + string(os.PathSeparator) + fileName)
 		if err != nil {
 			log.Println("error read image: err", err)
 			continue
 		}
 
-		pixels := make([]float64, 0, len(pixelsRaw))
-		for _, yy := range pixelsRaw {
+		pixels := make([]float64, 0, len(rawPixels))
+		for _, yy := range rawPixels {
 			for _, xx := range yy {
 				pixels = append(pixels, float64(xx.B/255)) // Get Blue and set only exist color
 			}
 		}
 
-		l.images[digit] = append(l.images[digit], &DigitBuff{
+		loadedDigits = append(loadedDigits, DigitBuff{
 			Digit:  digit,
 			Pixels: pixels,
 		})
+
 	}
 	log.Println("FINISH load digits")
 
-	return nil
+	return loadedDigits, len(fileDigits), nil
 }
 
-func (l *ImgDigits) GetDigitDataset(digit int8) ([]*DigitBuff, error) {
-	if digit < 0 || digit > 9 {
-		return nil, ErrImgDigitsDatasetNotFound
-	}
-
-	return l.images[digit], nil
-}
-
-func (l *ImgDigits) parseDigit(fileName string) (int8, error) {
+func parseDigit(fileName string) (int8, error) {
 	rfn := []rune(fileName)
 	// 059700-num4.png remove .png
 	rfn = rfn[:len(rfn)-4]
