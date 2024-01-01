@@ -5,15 +5,22 @@ type Layer struct {
 	nextSize int
 	neurons  []float64
 	biases   []float64
-	weights  map[int][]float64
+	weights  [][]float64
 }
 
-func NewLayer(size, nextSize int) *Layer {
-	return &Layer{
+func NewLayer(size, nextSize int) Layer {
+
+	weights := make([][]float64, size)
+
+	for i := range weights {
+		weights[i] = make([]float64, nextSize)
+	}
+
+	return Layer{
 		size:     size,
 		nextSize: nextSize,
-		neurons:  make([]float64, 0, size),
-		biases:   make([]float64, 0, size),
-		weights:  make(map[int][]float64),
+		neurons:  make([]float64, size),
+		biases:   make([]float64, size),
+		weights:  weights,
 	}
 }

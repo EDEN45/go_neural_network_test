@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"sync"
 )
 
 var ErrImgDigitsEmptyPath = fmt.Errorf("empty path")
@@ -17,7 +18,7 @@ var ErrImgDigitsDatasetNotFound = fmt.Errorf("dataset doen`t find")
 
 type DigitBuff struct {
 	Digit  int8
-	Pixels []float64
+	Pixels []float64 // just array of all dots
 }
 
 func LoadDigits(filesPath string) ([]DigitBuff, int, error) {
@@ -30,34 +31,50 @@ func LoadDigits(filesPath string) ([]DigitBuff, int, error) {
 
 	log.Println("START load digits, count: ", len(fileDigits))
 
-	for i, de := range fileDigits {
-		fmt.Printf("%.2f %s \n", float64(i)/float64(len(fileDigits))*100, " %")
-		fileName := de.Name()
-		digit, err := parseDigit(fileName)
-		if err != nil {
-			log.Println("Parse number digit, err: ", err.Error())
-			continue
-		}
+	digBuffer := make(chan DigitBuff)
 
-		rawPixels, err := rgbPixel.ReadPixels(filesPath + string(os.PathSeparator) + fileName)
-		if err != nil {
-			log.Println("error read image: err", err)
-			continue
-		}
-
-		pixels := make([]float64, 0, len(rawPixels))
-		for _, yy := range rawPixels {
-			for _, xx := range yy {
-				pixels = append(pixels, float64(xx.B/255)) // Get Blue and set only exist color
+	wg := sync.WaitGroup{}
+	wg.Add(len(fileDigits))
+	for _, de := range fileDigits {
+		go func() {
+			defer wg.Done()
+			fileName := de.Name()
+			digit, err := parseDigit(fileName)
+			if err != nil {
+				log.Println("Parse number digit, err: ", err.Error())
+				return
 			}
-		}
 
-		loadedDigits = append(loadedDigits, DigitBuff{
-			Digit:  digit,
-			Pixels: pixels,
-		})
+			rawPixels, err := rgbPixel.ReadPixels(filesPath + string(os.PathSeparator) + fileName)
+			if err != nil {
+				log.Println("error read image: err", err)
+				return
+			}
+
+			pixels := make([]float64, 0, len(rawPixels)*len(rawPixels[0]))
+			for _, yy := range rawPixels {
+				for _, xx := range yy {
+					pixels = append(pixels, float64(xx.B/255)) // Get Blue and set only exist color
+				}
+			}
+
+			digBuffer <- DigitBuff{
+				Digit:  digit,
+				Pixels: pixels,
+			}
+		}()
 
 	}
+
+	go func() {
+		wg.Wait()
+		close(digBuffer)
+	}()
+
+	for v := range digBuffer {
+		loadedDigits = append(loadedDigits, v)
+	}
+
 	log.Println("FINISH load digits")
 
 	return loadedDigits, len(fileDigits), nil
