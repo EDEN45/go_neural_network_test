@@ -53,7 +53,9 @@ func NewSimpleNeuralNetwork(conf SimpleNeuralNetworkConf) *SimpleNeuralNetwork {
 				if layers[i].weights[j] == nil {
 					layers[i].weights[j] = make([]float64, nextSize)
 				}
-				layers[i].weights[j][k] = rand.Float64()*2.0 - 1.0
+
+				zzz := rand.Float64()*2.0 - 1.0
+				layers[i].weights[j][k] = zzz
 			}
 		}
 	}
@@ -106,7 +108,7 @@ func (s *SimpleNeuralNetwork) BackPropagation(targets []float64) {
 			gradients[i] *= s.learningRate
 		}
 
-		deltas := make(map[int][]float64)
+		deltas := make([][]float64, l1.size)
 		for i := 0; i < l1.size; i++ {
 			for j := 0; j < l.size; j++ {
 				if deltas[i] == nil {

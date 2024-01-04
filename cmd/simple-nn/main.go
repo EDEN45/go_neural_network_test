@@ -21,13 +21,21 @@ func main() {
 	fmt.Println("---------------------------------")
 
 	nn := neural_network.NewSimpleNeuralNetwork(neural_network.SimpleNeuralNetworkConf{
-		LearningRate: 0.001,
+		LearningRate: 0.01,
 		FNActivation: neural_network.DefaultActivation,
 		FNDerivative: neural_network.DefaultDerivative,
 		SizeLayers:   []int{784, 512, 128, 32, 10},
 	})
 
-	for i := 0; i < 10; i++ {
+	//fmt.Println("---------------------------------")
+	//fmt.Println(digits[1].Digit, digits[1].FileName)
+	//fmt.Println(digits[1].Pixels)
+	//outputs := nn.FeedForward(digits[1].Pixels)
+	//fmt.Println(outputs)
+	//fmt.Println("---------------------------------")
+	//return
+
+	for i := 0; i < 1000; i++ {
 		var (
 			right     int     = 0
 			errorSum  float64 = 0
@@ -64,9 +72,9 @@ func main() {
 		fmt.Println("step: ", i, ". correct: ", right, ". error: ", errorSum)
 	}
 
-	rez := nn.FeedForward(digits[10].Pixels)
+	rez := nn.FeedForward(digits[1].Pixels)
 
-	maxRez := rez[0]
+	maxRez := -1.0
 	maxDig := 0
 	for dig, v := range rez {
 		if v > maxRez {
@@ -76,7 +84,52 @@ func main() {
 	}
 
 	fmt.Println("----------------------------")
-	fmt.Println(digits[10].Digit, maxDig)
+	fmt.Println(digits[1].Digit, maxDig)
+	fmt.Println(rez)
+	fmt.Println(maxRez)
+	fmt.Println("----------------------------")
+
+	maxRez = -1.0
+	maxDig = 0
+	for dig, v := range rez {
+		if v > maxRez {
+			maxRez = v
+			maxDig = dig
+		}
+	}
+
+	fmt.Println("----------------------------")
+	fmt.Println(digits[100].Digit, maxDig)
+	fmt.Println(rez)
+	fmt.Println(maxRez)
+	fmt.Println("----------------------------")
+
+	maxRez = -1.0
+	maxDig = 0
+	for dig, v := range rez {
+		if v > maxRez {
+			maxRez = v
+			maxDig = dig
+		}
+	}
+
+	fmt.Println("----------------------------")
+	fmt.Println(digits[1000].Digit, maxDig)
+	fmt.Println(rez)
+	fmt.Println(maxRez)
+	fmt.Println("----------------------------")
+
+	maxRez = -1.0
+	maxDig = 0
+	for dig, v := range rez {
+		if v > maxRez {
+			maxRez = v
+			maxDig = dig
+		}
+	}
+
+	fmt.Println("----------------------------")
+	fmt.Println(digits[10003].Digit, maxDig)
 	fmt.Println(rez)
 	fmt.Println(maxRez)
 	fmt.Println("----------------------------")

@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 )
 
 var ErrImgDigitsEmptyPath = fmt.Errorf("empty path")
@@ -17,8 +18,9 @@ var ErrImgDigitsDatasetNotFound = fmt.Errorf("dataset doen`t find")
 // git: https://github.com/pjreddie/mnist-csv-png
 
 type DigitBuff struct {
-	Digit  int8
-	Pixels []float64 // just array of all dots
+	FileName string
+	Digit    int8
+	Pixels   []float64 // just array of all dots
 }
 
 func LoadDigits(filesPath string) ([]DigitBuff, int, error) {
@@ -36,7 +38,7 @@ func LoadDigits(filesPath string) ([]DigitBuff, int, error) {
 	wg := sync.WaitGroup{}
 	wg.Add(len(fileDigits))
 	for _, de := range fileDigits {
-		go func() {
+		go func(de os.DirEntry) {
 			defer wg.Done()
 			fileName := de.Name()
 			digit, err := parseDigit(fileName)
@@ -54,16 +56,17 @@ func LoadDigits(filesPath string) ([]DigitBuff, int, error) {
 			pixels := make([]float64, 0, len(rawPixels)*len(rawPixels[0]))
 			for _, yy := range rawPixels {
 				for _, xx := range yy {
-					pixels = append(pixels, float64(xx.B/255)) // Get Blue and set only exist color
+					pixels = append(pixels, float64(xx.B)/255) // Get Blue and set only exist color
 				}
 			}
 
 			digBuffer <- DigitBuff{
-				Digit:  digit,
-				Pixels: pixels,
+				FileName: de.Name(),
+				Digit:    digit,
+				Pixels:   pixels,
 			}
-		}()
-
+		}(de)
+		time.Sleep(300 * time.Microsecond)
 	}
 
 	go func() {

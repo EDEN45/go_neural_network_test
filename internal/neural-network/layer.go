@@ -17,10 +17,10 @@ func NewLayer(size, nextSize int) Layer {
 	}
 
 	return Layer{
-		size:     size,
-		nextSize: nextSize,
-		neurons:  make([]float64, size),
-		biases:   make([]float64, size),
-		weights:  weights,
+		size: size,
+		//nextSize: nextSize,
+		neurons: make([]float64, size),
+		biases:  make([]float64, size),
+		weights: weights,
 	}
 }
