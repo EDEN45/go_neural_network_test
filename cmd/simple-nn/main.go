@@ -21,7 +21,7 @@ func main() {
 	fmt.Println("---------------------------------")
 
 	nn := neural_network.NewSimpleNeuralNetwork(neural_network.SimpleNeuralNetworkConf{
-		LearningRate: 0.01,
+		LearningRate: 0.001,
 		FNActivation: neural_network.DefaultActivation,
 		FNDerivative: neural_network.DefaultDerivative,
 		SizeLayers:   []int{784, 512, 128, 32, 10},
@@ -89,6 +89,7 @@ func main() {
 	fmt.Println(maxRez)
 	fmt.Println("----------------------------")
 
+	rez = nn.FeedForward(digits[100].Pixels)
 	maxRez = -1.0
 	maxDig = 0
 	for dig, v := range rez {
@@ -104,6 +105,7 @@ func main() {
 	fmt.Println(maxRez)
 	fmt.Println("----------------------------")
 
+	rez = nn.FeedForward(digits[1000].Pixels)
 	maxRez = -1.0
 	maxDig = 0
 	for dig, v := range rez {
@@ -119,6 +121,7 @@ func main() {
 	fmt.Println(maxRez)
 	fmt.Println("----------------------------")
 
+	rez = nn.FeedForward(digits[10003].Pixels)
 	maxRez = -1.0
 	maxDig = 0
 	for dig, v := range rez {
