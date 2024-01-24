@@ -1,9 +1,11 @@
 package digit_paint
 
 import (
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
 	"image"
 	"image/color"
 )
@@ -15,8 +17,8 @@ func NewForm() fyne.Window {
 
 	w := paintApp.NewWindow("digit paint")
 	w.Resize(fyne.Size{
-		Width:  2000,
-		Height: 1000,
+		Width:  800,
+		Height: 605,
 	})
 
 	vbox := container.NewVBox()
@@ -24,11 +26,27 @@ func NewForm() fyne.Window {
 		Width: 200,
 	})
 
-	iig := image.NewRGBA(image.Rectangle{Min: image.Point{X: 0, Y: 0}, Max: image.Point{X: 1800, Y: 800}})
+	iig := image.NewRGBA(image.Rectangle{Min: image.Point{X: 0, Y: 0}, Max: image.Point{X: 28, Y: 28}})
 	pw := NewPaintWidget(iig)
-	pw.Resize(fyne.NewSize(1800, 800))
+	pw.Resize(fyne.NewSize(600, 600))
 	pw.Refresh()
-	grw := container.NewGridWrap(fyne.NewSize(1800, 800), pw)
+
+	vbox.Add(widget.NewButton("Очистить", func() {
+		pw.Clear().Refresh()
+	}))
+
+	pbs := make([]*widget.ProgressBar, 0, 10)
+
+	for i := 0; i < 10; i++ {
+		lb := widget.NewLabel(fmt.Sprint(i))
+		vbox.Add(lb)
+		pb := widget.NewProgressBar()
+		vbox.Add(pb)
+
+		pbs = append(pbs, pb)
+	}
+
+	grw := container.NewGridWrap(fyne.NewSize(600, 600), pw)
 	cn := container.NewHBox(grw, vbox)
 
 	w.SetContent(cn)

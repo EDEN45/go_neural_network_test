@@ -16,6 +16,9 @@ type PaintWidget struct {
 	widget.BaseWidget
 	Raster *canvas.Raster
 	Img    *image.RGBA
+
+	Width  float32
+	Height float32
 }
 
 func (w *PaintWidget) MouseOut() {
@@ -61,7 +64,10 @@ func (w *PaintWidget) commonDraw(ev *desktop.MouseEvent) {
 		drawColor = color.Black
 	}
 
-	drawCircle(w.Img, int(ev.Position.X), int(ev.Position.Y), 10, drawColor)
+	x := ev.Position.X * float32(w.Img.Rect.Max.X) / w.Width
+	y := ev.Position.Y * float32(w.Img.Rect.Max.Y) / w.Height
+
+	drawCircle(w.Img, int(x), int(y), 1, drawColor)
 	w.Raster.Generator = func(_, _ int) image.Image {
 		return w.Img
 	}
@@ -83,6 +89,22 @@ func (w *PaintWidget) MouseIn(ev *desktop.MouseEvent) {
 
 func (w *PaintWidget) MouseMoved(ev *desktop.MouseEvent) {
 	w.commonDraw(ev)
+}
+
+func (w *PaintWidget) Resize(size fyne.Size) {
+	w.Height = size.Height
+	w.Width = size.Width
+	w.BaseWidget.Resize(size)
+}
+
+func (w *PaintWidget) Clear() *PaintWidget {
+	for x := 0; x < w.Img.Rect.Max.X; x++ {
+		for y := 0; y < w.Img.Rect.Max.Y; y++ {
+			w.Img.Set(x, y, color.Black)
+		}
+	}
+
+	return w
 }
 
 type PaintWidgetRenderer struct {
