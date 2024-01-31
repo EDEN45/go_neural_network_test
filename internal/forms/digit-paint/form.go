@@ -39,9 +39,8 @@ func NewForm() fyne.Window {
 
 	for i := 0; i < 10; i++ {
 		lb := widget.NewLabel(fmt.Sprint(i))
-		vbox.Add(lb)
 		pb := widget.NewProgressBar()
-		vbox.Add(pb)
+		vbox.Add(container.NewHBox(lb, pb))
 
 		pbs = append(pbs, pb)
 	}
