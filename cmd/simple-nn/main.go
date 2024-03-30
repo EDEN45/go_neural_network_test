@@ -7,6 +7,7 @@ import (
 	_ "image/png"
 	"log"
 	"math/rand"
+	"time"
 )
 
 func main() {
@@ -15,6 +16,8 @@ func main() {
 		log.Println(err)
 		return
 	}
+
+	rand.Seed(time.Now().UnixNano())
 
 	fmt.Println("---------------------------------")
 	fmt.Println(len(digits), countFiles)
@@ -27,15 +30,7 @@ func main() {
 		SizeLayers:   []int{784, 512, 128, 32, 10},
 	})
 
-	//fmt.Println("---------------------------------")
-	//fmt.Println(digits[1].Digit, digits[1].FileName)
-	//fmt.Println(digits[1].Pixels)
-	//outputs := nn.FeedForward(digits[1].Pixels)
-	//fmt.Println(outputs)
-	//fmt.Println("---------------------------------")
-	//return
-
-	for i := 0; i < 1000; i++ {
+	for i := 1; i < 1000; i++ {
 		var (
 			right     int     = 0
 			errorSum  float64 = 0
@@ -43,7 +38,7 @@ func main() {
 		)
 
 		for bs := 0; bs < batchSize; bs++ {
-			imgIndex := int(rand.Float32() * float32(countFiles))
+			imgIndex := int(rand.Float64() * float64(countFiles))
 			targets := make([]float64, 10)
 			digit := digits[imgIndex].Digit
 			targets[digit] = 1

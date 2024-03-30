@@ -66,7 +66,7 @@ func LoadDigits(filesPath string) ([]DigitBuff, int, error) {
 				Pixels:   pixels,
 			}
 		}(de)
-		time.Sleep(300 * time.Microsecond)
+		time.Sleep(500 * time.Microsecond)
 	}
 
 	go func() {

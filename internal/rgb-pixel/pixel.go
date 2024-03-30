@@ -3,6 +3,7 @@ package rgb_pixel
 import (
 	"fmt"
 	"image"
+	"image/color"
 	"os"
 )
 
@@ -16,7 +17,7 @@ type Pixel struct {
 func PixelFromRGBA(r, g, b, a uint32) Pixel {
 	// color can be from 0 to 255
 	// we get color [0, 0xffff] or [0, 65535]. If we have 65535, then divide 257 and get 255
-	return Pixel{R: r / 257, G: g / 257, B: b / 257, A: a / 257}
+	return Pixel{R: r & 0xff, G: g & 0xff, B: b & 0xff, A: a & 0xff}
 }
 
 // ReadPixels from full file path
@@ -43,8 +44,11 @@ func ReadPixels(fullFileName string) ([][]Pixel, error) {
 	for y := 0; y < height; y++ {
 		var row []Pixel
 		for x := 0; x < width; x++ {
+			oldPixel := img.At(x, y)
+			newColor := color.GrayModel.Convert(oldPixel)
 			row = append(row,
-				PixelFromRGBA(img.At(x, y).RGBA()))
+				PixelFromRGBA(newColor.RGBA()),
+			)
 		}
 		pixels = append(pixels, row)
 	}

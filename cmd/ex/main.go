@@ -13,5 +13,27 @@ func main() {
 		return
 	}
 
-	fmt.Println(p[24][5])
+	pixels := make([]float64, len(p)*len(p[0]))
+	i := 0
+	for _, yy := range p {
+		for _, xx := range yy {
+			px := float64(xx.B) / 255.0
+			pixels[i] = px // Get Blue and set only exist color
+			if px != 0 {
+				fmt.Println(i, xx, px)
+				return
+			}
+			i++
+		}
+	}
+
+	fmt.Println("-------------------")
+
+	for i, v := range pixels {
+		if v == 0 {
+			continue
+		}
+
+		fmt.Println(i, v)
+	}
 }
