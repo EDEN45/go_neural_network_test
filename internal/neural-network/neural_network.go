@@ -82,15 +82,15 @@ func (s *SimpleNeuralNetwork) FeedForward(inputs []float64) []float64 {
 			l1.neurons[j] = 0
 
 			for k := 0; k < l.size; k++ {
-				if len(l.weights) == 0 {
-					l.weights = make([][]float64, l.size)
-					fmt.Println("FIRST", i, j, k)
-				}
-
-				if len(l.weights[k]) == 0 {
-					l.weights = make([][]float64, l1.size)
-					fmt.Println("SECOND", i, j, k)
-				}
+				//if len(l.weights) == 0 {
+				//	l.weights = make([][]float64, l.size)
+				//	fmt.Println("FIRST", i, j, k)
+				//}
+				//
+				//if len(l.weights[k]) == 0 {
+				//	l.weights = make([][]float64, l1.size)
+				//	fmt.Println("SECOND", i, j, k)
+				//}
 				a2 := l.weights[k][j]
 
 				a1 := l.neurons[k]
