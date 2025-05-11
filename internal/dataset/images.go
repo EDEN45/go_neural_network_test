@@ -83,6 +83,27 @@ func LoadDigits(filesPath string) ([]DigitBuff, int, error) {
 	return loadedDigits, len(fileDigits), nil
 }
 
+func LoadPixelsImage(filePath string) ([]float64, error) {
+	if filePath == "" {
+		return nil, ErrImgDigitsEmptyPath
+	}
+
+	rawPixels, err := rgbPixel.ReadPixels(filePath)
+	if err != nil {
+		log.Println("error read image: err", err)
+		return nil, err
+	}
+
+	pixels := make([]float64, 0, len(rawPixels)*len(rawPixels[0]))
+	for _, yy := range rawPixels {
+		for _, xx := range yy {
+			pixels = append(pixels, float64(xx.B)/255) // Get Blue and set only exist color
+		}
+	}
+
+	return pixels, nil
+}
+
 func parseDigit(fileName string) (int8, error) {
 	rfn := []rune(fileName)
 	// 059700-num4.png remove .png

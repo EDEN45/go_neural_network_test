@@ -137,7 +137,7 @@ func (r *PaintWidgetRenderer) Refresh() {
 }
 
 //func tttte() {
-//	myApp := app.New()
+//	myApp := appcli.New()
 //	label := NewTestWidget("Hello World!")
 //	container.NewVBox(label)
 //	myWindow := myApp.NewWindow("Label Widget")

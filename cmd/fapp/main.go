@@ -3,7 +3,7 @@ package main
 import digit_paint "github.com/EDEN45/go_neural_network_test/internal/forms/digit-paint"
 
 func main() {
-	//a := app.New()
+	//a := appcli.New()
 	//w := a.NewWindow("Hello")
 	//w.Resize(fyne.Size{
 	//	Width:  800,

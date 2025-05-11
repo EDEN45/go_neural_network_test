@@ -1,23 +1,23 @@
 package neural_network
 
 type Layer struct {
-	size int
+	Size int `json:"size"`
 	//nextSize int
-	neurons []float64
-	biases  []float64
-	weights [][]float64
+	Neurons []float64   `json:"neurons"`
+	Biases  []float64   `json:"biases"`
+	Weights [][]float64 `json:"weights"`
 }
 
 func NewLayer(size int) Layer {
-	//for i := range weights {
-	//	weights[i] = make([]float64, size)
+	//for i := range Weights {
+	//	Weights[i] = make([]float64, Size)
 	//}
 
 	return Layer{
-		size: size,
+		Size: size,
 		//nextSize: nextSize,
-		neurons: make([]float64, size),
-		biases:  make([]float64, size),
-		weights: make([][]float64, size),
+		Neurons: make([]float64, size),
+		Biases:  make([]float64, size),
+		Weights: make([][]float64, size),
 	}
 }

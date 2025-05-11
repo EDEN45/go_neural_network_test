@@ -35,7 +35,7 @@ type SimpleNeuralNetworkConf struct {
 func NewSimpleNeuralNetwork(conf SimpleNeuralNetworkConf) *SimpleNeuralNetwork {
 	lenSizeLayers := len(conf.SizeLayers)
 
-	// we create neurons layers from of count layers
+	// we create Neurons layers from of count layers
 	layers := make([]Layer, lenSizeLayers)
 
 	for i := 0; i < lenSizeLayers; i++ {
@@ -49,17 +49,17 @@ func NewSimpleNeuralNetwork(conf SimpleNeuralNetworkConf) *SimpleNeuralNetwork {
 
 		for j := 0; j < conf.SizeLayers[i]; j++ {
 			//TODO -why?????
-			layers[i].biases[j] = rand.Float64()*2.0 - 1.0
-			layers[i].weights[j] = make([]float64, nextSize)
+			layers[i].Biases[j] = rand.Float64()*2.0 - 1.0
+			layers[i].Weights[j] = make([]float64, nextSize)
 			for k := 0; k < nextSize; k++ {
-				layers[i].weights[j][k] = rand.Float64()*2.0 - 1.0
+				layers[i].Weights[j][k] = rand.Float64()*2.0 - 1.0
 			}
 		}
 	}
 
 	fmt.Println("--------------")
 	for _, v := range layers {
-		fmt.Println(v.size)
+		fmt.Println(v.Size)
 	}
 	fmt.Println("--------------")
 
@@ -71,97 +71,110 @@ func NewSimpleNeuralNetwork(conf SimpleNeuralNetworkConf) *SimpleNeuralNetwork {
 	}
 }
 
+func (s *SimpleNeuralNetwork) GetModel() (learningRate float64, layers []Layer) {
+	learningRate = s.learningRate
+	layers = s.layers
+	return
+}
+
+func (s *SimpleNeuralNetwork) SetModel(learningRate float64, layers []Layer) {
+	s.learningRate = learningRate
+	s.layers = layers
+	s.fnDerivative = DefaultDerivative
+	s.fnActivation = DefaultActivation
+}
+
 func (s *SimpleNeuralNetwork) FeedForward(inputs []float64) []float64 {
-	copy(s.layers[0].neurons, inputs)
+	copy(s.layers[0].Neurons, inputs)
 
 	for i := 1; i < len(s.layers); i++ {
 		l := &s.layers[i-1]
 		l1 := &s.layers[i]
 
-		for j := 0; j < l1.size; j++ {
-			l1.neurons[j] = 0
+		for j := 0; j < l1.Size; j++ {
+			l1.Neurons[j] = 0
 
-			for k := 0; k < l.size; k++ {
-				//if len(l.weights) == 0 {
-				//	l.weights = make([][]float64, l.size)
+			for k := 0; k < l.Size; k++ {
+				//if len(l.Weights) == 0 {
+				//	l.Weights = make([][]float64, l.Size)
 				//	fmt.Println("FIRST", i, j, k)
 				//}
 				//
-				//if len(l.weights[k]) == 0 {
-				//	l.weights = make([][]float64, l1.size)
+				//if len(l.Weights[k]) == 0 {
+				//	l.Weights = make([][]float64, l1.Size)
 				//	fmt.Println("SECOND", i, j, k)
 				//}
-				a2 := l.weights[k][j]
+				a2 := l.Weights[k][j]
 
-				a1 := l.neurons[k]
-				l1.neurons[j] += a1 * a2
+				a1 := l.Neurons[k]
+				l1.Neurons[j] += a1 * a2
 			}
-			l1.neurons[j] += l1.biases[j]
-			l1.neurons[j] = s.fnActivation(l1.neurons[j])
+			l1.Neurons[j] += l1.Biases[j]
+			l1.Neurons[j] = s.fnActivation(l1.Neurons[j])
 		}
 	}
-	return s.layers[len(s.layers)-1].neurons
+	return s.layers[len(s.layers)-1].Neurons
 }
 
 func (s *SimpleNeuralNetwork) BackPropagation(targets []float64) {
-	commonErrs := make([]float64, s.layers[len(s.layers)-1].size)
+	commonErrs := make([]float64, s.layers[len(s.layers)-1].Size)
 
-	for i := 0; i < s.layers[len(s.layers)-1].size; i++ {
-		commonErrs[i] = targets[i] - s.layers[len(s.layers)-1].neurons[i]
+	for i := 0; i < s.layers[len(s.layers)-1].Size; i++ {
+		commonErrs[i] = targets[i] - s.layers[len(s.layers)-1].Neurons[i]
 	}
 
 	for k := len(s.layers) - 2; k >= 0; k-- {
 		l := &s.layers[k] //TODO что это?
 		l1 := &s.layers[k+1]
-		nextErrs := make([]float64, l.size)
-		gradients := make([]float64, l1.size)
+		nextErrs := make([]float64, l.Size)
+		gradients := make([]float64, l1.Size)
 
-		for i := 0; i < l1.size; i++ {
-			gradients[i] = commonErrs[i] * s.fnDerivative(l1.neurons[i])
+		for i := 0; i < l1.Size; i++ {
+			gradients[i] = commonErrs[i] * s.fnDerivative(l1.Neurons[i])
 			gradients[i] *= s.learningRate
 		}
 
-		deltas := make([][]float64, l1.size)
-		for i := 0; i < l1.size; i++ {
-			deltas[i] = make([]float64, l.size)
-			for j := 0; j < l.size; j++ {
-				deltas[i][j] = gradients[i] * l.neurons[j]
+		deltas := make([][]float64, l1.Size)
+		for i := 0; i < l1.Size; i++ {
+			deltas[i] = make([]float64, l.Size)
+			for j := 0; j < l.Size; j++ {
+				deltas[i][j] = gradients[i] * l.Neurons[j]
 			}
 		}
 
-		for i := 0; i < l.size; i++ {
+		for i := 0; i < l.Size; i++ {
 			nextErrs[i] = 0
-			for j := 0; j < l1.size; j++ {
-				nextErrs[i] += l.weights[i][j] * commonErrs[j]
+			for j := 0; j < l1.Size; j++ {
+				nextErrs[i] += l.Weights[i][j] * commonErrs[j]
 			}
 		}
 
-		//commonErrs = make([]float64, s.layers[k].size)
+		//commonErrs = make([]float64, s.layers[k].Size)
 		//for i, v := range nextErrs {
 		//	commonErrs[i] = v
 		//}
 
 		//commonErrs = nextErrs
 
-		commonErrs = make([]float64, l.size)
+		commonErrs = make([]float64, l.Size)
 		copy(commonErrs, nextErrs)
 
-		weightsNew := make([][]float64, len(l.weights))
+		weightsNew := make([][]float64, len(l.Weights))
 
-		for i := 0; i < l1.size; i++ {
+		for i := 0; i < l1.Size; i++ {
 
-			for j := 0; j < l.size; j++ {
+			for j := 0; j < l.Size; j++ {
 				if len(weightsNew[j]) == 0 {
-					weightsNew[j] = make([]float64, len(l.weights[0]))
+					weightsNew[j] = make([]float64, len(l.Weights[0]))
 				}
 
-				weightsNew[j][i] = l.weights[j][i] + deltas[i][j]
+				weightsNew[j][i] = l.Weights[j][i] + deltas[i][j]
 			}
 		}
 
-		l.weights = weightsNew
-		for i := 0; i < l1.size; i++ {
-			l1.biases[i] += gradients[i]
+		l.Weights = weightsNew
+		for i := 0; i < l1.Size; i++ {
+			l1.Biases[i] += gradients[i]
 		}
 	}
 }
