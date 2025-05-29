@@ -94,6 +94,10 @@ func LoadPixelsImage(filePath string) ([]float64, error) {
 		return nil, err
 	}
 
+	return PixelsToArr(rawPixels), nil
+}
+
+func PixelsToArr(rawPixels [][]rgbPixel.Pixel) []float64 {
 	pixels := make([]float64, 0, len(rawPixels)*len(rawPixels[0]))
 	for _, yy := range rawPixels {
 		for _, xx := range yy {
@@ -101,7 +105,7 @@ func LoadPixelsImage(filePath string) ([]float64, error) {
 		}
 	}
 
-	return pixels, nil
+	return pixels
 }
 
 func parseDigit(fileName string) (int8, error) {

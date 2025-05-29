@@ -60,6 +60,29 @@ func (c *Cli) Run() {
 					return predictImage(modelPath, input)
 				},
 			},
+			{
+				Name:  "server",
+				Usage: "Распознать изображение",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:  "addr",
+						Usage: "addr",
+						//Required: true,
+					},
+					&cli.StringFlag{
+						Name:     "model",
+						Usage:    "Путь к файлу модели",
+						Value:    "model.json",
+						Required: true,
+					},
+				},
+
+				Action: func(c *cli.Context) error {
+					addr := c.String("addr")
+					modelPath := c.String("model")
+					return server(addr, modelPath)
+				},
+			},
 		},
 	}
 

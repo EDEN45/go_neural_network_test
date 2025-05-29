@@ -38,6 +38,10 @@ func ReadPixels(fullFileName string) ([][]Pixel, error) {
 		return nil, err
 	}
 
+	return ExtractPixels(img), nil
+}
+
+func ExtractPixels(img image.Image) [][]Pixel {
 	bounds := img.Bounds()
 	width, height := bounds.Max.X, bounds.Max.Y
 	var pixels [][]Pixel
@@ -53,5 +57,5 @@ func ReadPixels(fullFileName string) ([][]Pixel, error) {
 		pixels = append(pixels, row)
 	}
 
-	return pixels, nil
+	return pixels
 }
